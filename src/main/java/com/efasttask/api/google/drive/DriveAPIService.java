@@ -18,7 +18,10 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -59,11 +62,9 @@ public class DriveAPIService {
      * @throws IOException If the credentials.json file cannot be found.
      */
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        // Load client secrets.
         InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-        // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
@@ -74,7 +75,6 @@ public class DriveAPIService {
     }
 
     private Drive createService() throws GeneralSecurityException, IOException {
-        // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
@@ -88,7 +88,6 @@ public class DriveAPIService {
         String pageToken = null;
         do {
             FileList result = this.driveService.files().list().setQ(String.format(query, parentFolderId)).setSpaces("drive")
-                    // Fields will be assigned values: id, name, createdTime
                     .setFields("nextPageToken, files(id, name, createdTime)")
                     .setPageToken(pageToken).execute();
             folders.addAll(result.getFiles());
