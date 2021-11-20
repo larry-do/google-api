@@ -12,6 +12,6 @@ public class Main {
                 Main.class.getClassLoader().getResource("credentials.json").getPath(),
                 "drive_token", DriveScopes.DRIVE);
 
-        driveAPIService.uploadFile(DriveAPIService.ROOT_FOLDER, new File("E:\\Music\\Shun Akiyama (秋山 駿) - Baka Mitai (馬鹿みたい) Lyrics (Romaji+Kanji+Eng Trans) Yakuza 5 (龍が如く) OST.mp3"));
+        driveAPIService.getSubFolders(DriveAPIService.ROOT_FOLDER);
     }
 }

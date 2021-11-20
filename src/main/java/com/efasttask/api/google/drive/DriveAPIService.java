@@ -26,6 +26,7 @@ import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class DriveAPIService {
@@ -102,7 +103,7 @@ public class DriveAPIService {
         fileMetadata.setName(newFolderName);
         fileMetadata.setMimeType("application/vnd.google-apps.folder");
         if (parentFolderId != null) {
-            List<String> parents = List.of(parentFolderId);
+            List<String> parents = Collections.singletonList(parentFolderId);
             fileMetadata.setParents(parents);
         }
         return driveService.files().create(fileMetadata).setFields("id, name").execute();
@@ -112,7 +113,7 @@ public class DriveAPIService {
                            String fileName, AbstractInputStreamContent uploadStreamContent) throws IOException {
         File fileMetadata = new File();
         fileMetadata.setName(fileName);
-        List<String> parents = List.of(folderId);
+        List<String> parents = Collections.singletonList(folderId);
         fileMetadata.setParents(parents);
         return driveService.files().create(fileMetadata, uploadStreamContent)
                 .setFields("id, webContentLink, webViewLink, parents").execute();
