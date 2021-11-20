@@ -12,6 +12,10 @@ public class Main {
                 Main.class.getClassLoader().getResource("credentials.json").getPath(),
                 "drive_token", DriveScopes.DRIVE);
 
-        driveAPIService.getSubFolders(DriveAPIService.ROOT_FOLDER);
+        com.google.api.services.drive.model.File file = driveAPIService.uploadFile(DriveAPIService.ROOT_FOLDER,
+                new File("C:\\Users\\Admin\\Documents\\DEMO DANG BAI\\TGH1321\\TGH1321 - FILE IN.jpg"));
+        if (file != null) {
+            System.out.println(file.toPrettyString());
+        }
     }
 }
