@@ -167,4 +167,9 @@ public class DriveAPIService {
     public void storeFileToDisk(String directory, String fileId) throws IOException {
         Files.write((new java.io.File(directory)).toPath(), this.downloadFile(fileId).toByteArray());
     }
+
+    public InputStream getFileInputStream(String fileId) throws IOException {
+        return this.driveService.files().get(fileId)
+                .executeMediaAsInputStream();
+    }
 }

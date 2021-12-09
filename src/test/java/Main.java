@@ -15,7 +15,7 @@ public class Main {
         String pageToken = null;
         do {
             FileList result = driveAPIService.getDriveService().files().list()
-                    .setQ("name contains 'FILE IN'")
+                    .setQ("name contains 'synergix'")
                     .setSpaces("drive")
                     .setFields("nextPageToken, files(id, name)")
                     .setPageToken(pageToken)
@@ -23,7 +23,7 @@ public class Main {
             for (File file : result.getFiles()) {
                 System.out.printf("Found file: %s (%s)\n",
                         file.getName(), file.getId());
-                driveAPIService.storeFileToDisk(System.getProperty("user.dir") + "/" + file.getName(), file.getId());
+                /*driveAPIService.storeFileToDisk(System.getProperty("user.dir") + "/" + file.getName(), file.getId());*/
             }
             pageToken = result.getNextPageToken();
         } while (pageToken != null);
