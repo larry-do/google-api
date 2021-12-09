@@ -1,8 +1,11 @@
 import com.efasttask.api.google.drive.DriveAPIService;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 
 public class Main {
@@ -11,10 +14,20 @@ public class Main {
                 Main.class.getClassLoader().getResource("credentials.json").getPath(),
                 "drive_token", DriveScopes.DRIVE);
 
-        com.google.api.services.drive.model.File file = driveAPIService.uploadFile(DriveAPIService.ROOT_FOLDER,
-                new File("C:\\Users\\Admin\\Documents\\DEMO DANG BAI\\TGH1321\\TGH1321 - FILE IN.jpg"));
-        if (file != null) {
-            System.out.println(file.toPrettyString());
-        }
+        String pageToken = null;
+        do {
+            FileList result = driveAPIService.getDriveService().files().list()
+                    .setQ("name contains 'FILE IN'")
+                    .setSpaces("drive")
+                    .setFields("nextPageToken, files(id, name)")
+                    .setPageToken(pageToken)
+                    .execute();
+            for (File file : result.getFiles()) {
+                System.out.printf("Found file: %s (%s)\n",
+                        file.getName(), file.getId());
+                driveAPIService.storeFileToDisk(System.getProperty("user.dir") + "/" + file.getName(), file.getId());
+            }
+            pageToken = result.getNextPageToken();
+        } while (pageToken != null);
     }
 }
