@@ -4,8 +4,6 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 
 public class Main {

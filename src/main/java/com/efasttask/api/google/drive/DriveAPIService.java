@@ -17,14 +17,12 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
@@ -153,6 +151,10 @@ public class DriveAPIService {
                            String fileName, InputStream inputStream) throws IOException {
         AbstractInputStreamContent uploadStreamContent = new InputStreamContent(contentType, inputStream);
         return uploadFile(folderId, contentType, fileName, uploadStreamContent);
+    }
+
+    public File findFile(String fileId) throws IOException {
+        return this.driveService.files().get(fileId).execute();
     }
 
     public ByteArrayOutputStream downloadFile(String fileId) throws IOException {
