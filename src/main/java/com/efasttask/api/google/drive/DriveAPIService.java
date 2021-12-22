@@ -13,6 +13,7 @@ import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -37,7 +38,6 @@ public class DriveAPIService {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     private final String APPLICATION_NAME;
-    private final String TOKENS_DIRECTORY_PATH;
 
     private final Drive driveService;
 
@@ -47,18 +47,23 @@ public class DriveAPIService {
      */
     private final List<String> SCOPES;
     private final InputStream credentialsFileInputStream;
+    private final DataStoreFactory dataStoreFactory;
 
-    public DriveAPIService(final String APPLICATION_NAME, final InputStream credentialsFileInputStream, final String TOKENS_DIRECTORY_PATH, String... SCOPES) throws GeneralSecurityException, IOException {
+    public DriveAPIService(final String APPLICATION_NAME, final InputStream credentialsFileInputStream, final DataStoreFactory dataStoreFactory, String... SCOPES) throws GeneralSecurityException, IOException {
         this.APPLICATION_NAME = APPLICATION_NAME;
         this.credentialsFileInputStream = credentialsFileInputStream;
-        this.TOKENS_DIRECTORY_PATH = TOKENS_DIRECTORY_PATH;
+        this.dataStoreFactory = dataStoreFactory;
         this.SCOPES = Arrays.asList(SCOPES);
 
         this.driveService = createService();
     }
 
+    public DriveAPIService(final String APPLICATION_NAME, final InputStream credentialsFileInputStream, final String TOKENS_DIRECTORY_PATH, String... SCOPES) throws GeneralSecurityException, IOException {
+        this(APPLICATION_NAME, credentialsFileInputStream, new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)), SCOPES);
+    }
+
     public DriveAPIService(final String APPLICATION_NAME, final String CREDENTIALS_FILE_PATH, final String TOKENS_DIRECTORY_PATH, String... SCOPES) throws GeneralSecurityException, IOException {
-        this(APPLICATION_NAME, new FileInputStream(CREDENTIALS_FILE_PATH), TOKENS_DIRECTORY_PATH, SCOPES);
+        this(APPLICATION_NAME, new FileInputStream(CREDENTIALS_FILE_PATH), new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)), SCOPES);
     }
 
     /**
@@ -73,7 +78,7 @@ public class DriveAPIService {
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(dataStoreFactory)
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();

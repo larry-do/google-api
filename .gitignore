@@ -2,3 +2,4 @@
 /target/
 /.idea/
 /drive_token/
+/src/test/resources/credentials.json
