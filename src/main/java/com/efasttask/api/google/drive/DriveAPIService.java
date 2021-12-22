@@ -39,22 +39,26 @@ public class DriveAPIService {
     private final String APPLICATION_NAME;
     private final String TOKENS_DIRECTORY_PATH;
 
+    private final Drive driveService;
+
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private final List<String> SCOPES;
-    private final String CREDENTIALS_FILE_PATH;
+    private final InputStream credentialsFileInputStream;
 
-    private final Drive driveService;
-
-    public DriveAPIService(final String APPLICATION_NAME, final String CREDENTIALS_FILE_PATH, final String TOKENS_DIRECTORY_PATH, String... SCOPES) throws GeneralSecurityException, IOException {
+    public DriveAPIService(final String APPLICATION_NAME, final InputStream credentialsFileInputStream, final String TOKENS_DIRECTORY_PATH, String... SCOPES) throws GeneralSecurityException, IOException {
         this.APPLICATION_NAME = APPLICATION_NAME;
-        this.CREDENTIALS_FILE_PATH = CREDENTIALS_FILE_PATH;
+        this.credentialsFileInputStream = credentialsFileInputStream;
         this.TOKENS_DIRECTORY_PATH = TOKENS_DIRECTORY_PATH;
         this.SCOPES = Arrays.asList(SCOPES);
 
         this.driveService = createService();
+    }
+
+    public DriveAPIService(final String APPLICATION_NAME, final String CREDENTIALS_FILE_PATH, final String TOKENS_DIRECTORY_PATH, String... SCOPES) throws GeneralSecurityException, IOException {
+        this(APPLICATION_NAME, new FileInputStream(CREDENTIALS_FILE_PATH), TOKENS_DIRECTORY_PATH, SCOPES);
     }
 
     /**
@@ -65,8 +69,7 @@ public class DriveAPIService {
      * @throws IOException If the credentials.json file cannot be found.
      */
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(credentialsFileInputStream));
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
