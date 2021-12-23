@@ -123,6 +123,22 @@ public class DriveAPIService {
         return driveService.files().create(fileMetadata).setFields("id, name").execute();
     }
 
+    public List<File> searchFolder(final String folderName) throws IOException {
+        String query = " mimeType = 'application/vnd.google-apps.folder' and name = '%s'";
+
+        List<File> folders = new ArrayList<>();
+        String pageToken = null;
+        do {
+            FileList result = this.driveService.files().list().setQ(String.format(query, folderName)).setSpaces("drive")
+                    .setFields("nextPageToken, files(id, name, createdTime)")
+                    .setPageToken(pageToken).execute();
+            folders.addAll(result.getFiles());
+            pageToken = result.getNextPageToken();
+        } while (pageToken != null);
+
+        return folders;
+    }
+
     public File uploadFile(String folderId, String contentType,
                            String fileName, AbstractInputStreamContent uploadStreamContent) throws IOException {
         File fileMetadata = new File();
